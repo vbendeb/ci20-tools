@@ -16,16 +16,13 @@ source := $(addprefix usb-nand/,$(source_files))
 objs := $(addprefix $(local_out)/,$(patsubst %.c,%.o,$(source_files)))
 -include $(objs:.o=.o.d)
 
-libs := \
-	-L$(dir $(ci20_lib)) -lci20
-
 all: $(local_out)/ci20-usb-nand
 $(local_out)/ci20-usb-nand: objs := $(objs)
 $(local_out)/ci20-usb-nand: libs := $(libs)
 $(local_out)/ci20-usb-nand: $(objs) $(ci20_lib) $(common_lib)
 	@mkdir -p $(dir $@)
 	@echo "CCLD    $@"
-	$(SILENT)$(CC) $(LDFLAGS) $(libs) -o $@ $(objs) $(common_lib)
+	$(SILENT)$(CC) $(LDFLAGS) -o $@ $(objs) $(dev_libs) $(common_lib)
 
 $(objs): $$(patsubst $(local_out)/%.o,usb-nand/%.c,$$@) Makefile usb-nand/Makefile
 	@mkdir -p $(dir $@)

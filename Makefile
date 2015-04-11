@@ -46,6 +46,9 @@ install-tools: all
 include fw/Makefile
 include lib/Makefile
 include usb-common/Makefile
+
+dev_libs :=  -L$(dir $(ci20_lib)) -lci20 -lusb-1.0
+
 include usb-boot/Makefile
 include usb-nand/Makefile
 include usb-test/Makefile

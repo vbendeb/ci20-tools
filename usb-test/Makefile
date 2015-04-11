@@ -16,16 +16,13 @@ source := $(addprefix usb-test/,$(source_files))
 objs := $(addprefix $(local_out)/,$(patsubst %.c,%.o,$(source_files)))
 -include $(objs:.o=.o.d)
 
-libs := \
-	-L$(dir $(ci20_lib)) -lci20
-
 all: $(local_out)/ci20-usb-test
 $(local_out)/ci20-usb-test: objs := $(objs)
 $(local_out)/ci20-usb-test: libs := $(libs)
 $(local_out)/ci20-usb-test: $(objs) $(ci20_lib) $(common_lib)
 	@mkdir -p $(dir $@)
 	@echo "CCLD    $@"
-	$(SILENT)$(CC) $(LDFLAGS) $(libs) -o $@ $(objs) $(common_lib)
+	$(SILENT)$(CC) $(LDFLAGS) -o $@ $(objs) $(dev_libs) $(common_lib)
 
 $(objs): $$(patsubst $(local_out)/%.o,usb-test/%.c,$$@) Makefile usb-test/Makefile
 	@mkdir -p $(dir $@)
