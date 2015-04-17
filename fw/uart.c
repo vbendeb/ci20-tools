@@ -91,6 +91,8 @@ void uart_init(unsigned uart, unsigned baud)
 
 void uart_putc(char c)
 {
+	if (c == '\n')
+		uart_putc('\r');
 	while (!(read_lsr() & LSR_THRE));
 	write_thr(c);
 }
