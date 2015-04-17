@@ -112,14 +112,14 @@ static void handle_descriptor_request(void)
 		default:
 			debug("WARN: unhandled string descriptor 0x");
 			debug_hex(idx, 0);
-			debug("\r\n");
+			debug("\n");
 		}
 		break;
 
 	default:
 		debug("WARN: unhandled descriptor type 0x");
 		debug_hex(type, 0);
-		debug("\r\n");
+		debug("\n");
 	}
 }
 
@@ -133,7 +133,7 @@ static void handle_standard_request(void)
 	default:
 		debug("WARN: unhandled standard request 0x");
 		debug_hex(setup_packet.bRequest, 2);
-		debug("\r\n");
+		debug("\n");
 	}
 }
 
@@ -152,7 +152,7 @@ static void handle_vendor_request(void)
 		in_data.data = cpu_info;
 		in_data.size = sizeof(cpu_info);
 
-		debug("GET_CPU_INFO\r\n");
+		debug("GET_CPU_INFO\n");
 		break;
 
 	case FW_REQ_MEM_READ:
@@ -163,7 +163,7 @@ static void handle_vendor_request(void)
 		debug_hex((uint32_t)in_data.data, 8);
 		debug(" length=0x");
 		debug_hex(in_data.size, 0);
-		debug("\r\n");
+		debug("\n");
 		break;
 
 	case FW_REQ_MEM_WRITE:
@@ -174,7 +174,7 @@ static void handle_vendor_request(void)
 		debug_hex((uint32_t)out_data.data, 8);
 		debug(" length=0x");
 		debug_hex(out_data.size, 0);
-		debug("\r\n");
+		debug("\n");
 		break;
 
 	case FW_REQ_MEM_SET:
@@ -184,7 +184,7 @@ static void handle_vendor_request(void)
 
 		debug("MEM_SET addr=0x");
 		debug_hex((uint32_t)cmd_data.mem_set.base, 8);
-		debug("\r\n");
+		debug("\n");
 		break;
 
 	case FW_REQ_CACHE_INIT:
@@ -192,19 +192,19 @@ static void handle_vendor_request(void)
 
 		switch (setup_packet.wValue) {
 		case CACHE_D:
-			debug(" DCACHE\r\n");
+			debug(" DCACHE\n");
 			init_dcache();
 			break;
 
 		case CACHE_I:
-			debug(" ICACHE\r\n");
+			debug(" ICACHE\n");
 			init_icache();
 			break;
 
 		default:
 			debug(" unknown=0x");
 			debug_hex(setup_packet.wValue, 0);
-			debug("\r\n");
+			debug("\n");
 			break;
 		}
 		break;
@@ -218,17 +218,17 @@ static void handle_vendor_request(void)
 
 		switch (setup_packet.wValue) {
 		case CACHE_D:
-			debug(" DCACHE\r\n");
+			debug(" DCACHE\n");
 			break;
 
 		case CACHE_I:
-			debug(" ICACHE\r\n");
+			debug(" ICACHE\n");
 			break;
 
 		default:
 			debug(" unknown=0x");
 			debug_hex(setup_packet.wValue, 0);
-			debug("\r\n");
+			debug("\n");
 			break;
 		}
 		break;
@@ -238,7 +238,7 @@ static void handle_vendor_request(void)
 		debug_hex(setup_packet.wValue, 0);
 		debug(" sel=0x");
 		debug_hex(setup_packet.wIndex, 0);
-		debug("\r\n");
+		debug("\n");
 
 		cmd_data.mfc0.value = dynamic_mfc0(setup_packet.wValue,
 						   setup_packet.wIndex);
@@ -252,7 +252,7 @@ static void handle_vendor_request(void)
 		debug_hex(setup_packet.wValue, 0);
 		debug(" sel=0x");
 		debug_hex(setup_packet.wIndex, 0);
-		debug("\r\n");
+		debug("\n");
 
 		cmd_data.mtc0.reg = setup_packet.wValue;
 		cmd_data.mtc0.sel = setup_packet.wIndex;
@@ -264,7 +264,7 @@ static void handle_vendor_request(void)
 	case FW_REQ_JUMP:
 		debug("JUMP addr=0x");
 		debug_hex(u32val, 8);
-		debug("\r\n");
+		debug("\n");
 
 		cmd_data.jump.addr = u32val;
 		break;
@@ -272,7 +272,7 @@ static void handle_vendor_request(void)
 	case FW_REQ_BULK_LENGTH:
 		debug("BULK_LENGTH len=0x");
 		debug_hex(u32val, 8);
-		debug("\r\n");
+		debug("\n");
 
 		switch (prev_cmd) {
 		case FW_REQ_MEM_READ:
@@ -284,7 +284,7 @@ static void handle_vendor_request(void)
 			break;
 
 		default:
-			debug("   INVALID!\r\n");
+			debug("   INVALID!\n");
 			break;
 		}
 		break;
@@ -296,7 +296,7 @@ static void handle_vendor_request(void)
 		debug_hex(setup_packet.wValue, 0);
 		debug(" baud=0x");
 		debug_hex(baud, 0);
-		debug("\r\n");
+		debug("\n");
 
 		uart_init(setup_packet.wValue, baud);
 		break;
@@ -353,13 +353,13 @@ static void handle_start_fram_interrupt(void)
 
 static void handle_usb_reset_interrupt(void)
 {
-	debug("usb_reset\r\n");
+	debug("usb_reset\n");
 	set_gint_sts(GINTSTS_USB_RESET);
 }
 
 static void handle_enum_done_interrupt(void)
 {
-	debug("enum_done\r\n");
+	debug("enum_done\n");
 	set_gint_sts(GINTSTS_ENUM_DONE);
 }
 
@@ -385,7 +385,7 @@ static void read_out_data(unsigned ep, unsigned sz)
 		if (out_data.size >= 4) {
 			debug("<< 0x");
 			debug_hex(val, 8);
-			debug("\r\n");
+			debug("\n");
 
 			*((volatile uint32_t *)out_data.data) = val;
 			out_data.data += 4;
@@ -393,7 +393,7 @@ static void read_out_data(unsigned ep, unsigned sz)
 		} else while (out_data.size > 0) {
 			debug("<< 0x");
 			debug_hex(val & 0xff, 2);
-			debug("\r\n");
+			debug("\n");
 
 			*((volatile uint8_t *)out_data.data) = val;
 			val >>= 8;
@@ -488,7 +488,7 @@ static void handle_iep_interrupt(void)
 
 				debug(">> 0x");
 				debug_hex(val, 8);
-				debug("\r\n");
+				debug("\n");
 				write_ep_fifo(ep, val);
 
 				in_data.data += 4;
@@ -515,7 +515,7 @@ static void handle_iep_interrupt(void)
 
 			debug(">> 0x");
 			debug_hex(short_data, (xfered % 4) * 2);
-			debug("\r\n");
+			debug("\n");
 			write_ep_fifo(ep, short_data);
 		}
 
