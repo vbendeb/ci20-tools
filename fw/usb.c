@@ -302,7 +302,7 @@ static void handle_vendor_request(void)
 		break;
 
 	case FW_REQ_RESTART:
-		debug("restart requested\n");
+		ci20_fw_reset();
 		break;
 	}
 }

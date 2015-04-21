@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 	       otp.mac[0], otp.mac[1], otp.mac[2],
 	       otp.mac[3], otp.mac[4], otp.mac[5]);
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < 2; i++) {
 		ci20_pin_config(dev, 5, 15, PIN_GPIO_OUT_LOW + (i % 2));
 		sleep(1);
 	}
