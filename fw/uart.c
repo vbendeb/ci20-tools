@@ -40,7 +40,6 @@ UART_GEN_ACCESSORS(4, mcr)
 UART_GEN_ACCESSORS(5, lsr)
 UART_GEN_ACCESSORS(6, msr)
 UART_GEN_ACCESSORS(7, spr)
-UART_GEN_ACCESSORS(0x11, tcr)
 
 #undef UART_GEN_ACCESSORS
 
@@ -92,10 +91,7 @@ void uart_init(unsigned uart, unsigned baud)
 
 void uart_putc(char c)
 {
-	if (c == '\n')
-		uart_putc('\r');
-	while (read_tcr() & ((1 << 7) - 1))
-		;
+	while (!(read_lsr() & LSR_THRE));
 	write_thr(c);
 }
 

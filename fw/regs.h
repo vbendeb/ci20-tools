@@ -45,9 +45,4 @@
 #define s8 $30
 #define ra $31
 
-#define CI20_REG_TDR  ((volatile uint32_t *)0xb0002000)
-#define CI20_REG_TCER ((volatile uint32_t *)0xb0002004)
-#define CI20_REG_TCNT ((volatile uint32_t *)0xb0002008)
-#define CI20_REG_TCSR ((volatile uint32_t *)0xb000200C)
-
 #endif /* __FW_REGS_H__ */

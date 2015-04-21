@@ -50,6 +50,5 @@ extern int ci20_usb_mtc0(struct ci20_usb_dev *dev, unsigned reg, unsigned sel, u
 extern int ci20_usb_jump(struct ci20_usb_dev *dev, uint32_t addr);
 
 extern int ci20_usb_uart_init(struct ci20_usb_dev *dev, unsigned uart, unsigned baud);
-extern int ci20_usb_restart(struct ci20_usb_dev *dev);
 
 #endif /* __usb_usb_h__ */

@@ -169,8 +169,6 @@ dev_err:
 
 void ci20_usb_close(struct ci20_usb_dev *dev)
 {
-	ci20_usb_restart(dev);
-
 	if (dev->next == dev) {
 		dev->usb->devices = NULL;
 	} else {
@@ -196,19 +194,6 @@ int ci20_usb_readmem(struct ci20_usb_dev *dev, void *buf, size_t sz, uint32_t ad
 		return err;
 	if (err != sz)
 		return -EIO;
-	return 0;
-}
-
-int ci20_usb_restart(struct ci20_usb_dev *dev)
-{
-	int err;
-
-	err = libusb_control_transfer(
-		dev->hnd,
-		LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
-		FW_REQ_RESTART, 0, 0, (unsigned char *)&err, 0, dev->timeout);
-	if (err < 0)
-		return err;
 	return 0;
 }
 

@@ -30,6 +30,4 @@
 
 #define clz __builtin_clz
 
-extern void ci20_fw_reset(void);
-
 #endif /* __FW_UTIL_H__ */
