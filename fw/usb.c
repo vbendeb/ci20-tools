@@ -300,6 +300,10 @@ static void handle_vendor_request(void)
 
 		uart_init(setup_packet.wValue, baud);
 		break;
+
+	case FW_REQ_RESTART:
+		ci20_fw_reset();
+		break;
 	}
 }
 
