@@ -13,6 +13,7 @@
 #include "gpio.h"
 #include "io.h"
 #include "uart.h"
+#include "../lib/util.h"
 
 static void *uart_base;
 static unsigned uart_baud;
@@ -58,6 +59,67 @@ UART_GEN_ACCESSORS(0x11, tcr)
 #define LSR_THRE	(1 << 5)
 #define LSR_TEMT	(1 << 6)
 
+static int configure_uart_clock_and_pinmux(unsigned uart)
+{
+	const struct {
+		unsigned gpio:3;	/* max 6 regs. */
+		unsigned func:2;	/* max 4 functions */
+		unsigned rxd_pin:5;	/* max 32 bits */
+		unsigned txd_pin:5;	/* max 32 bits */
+	} uart_to_pins[] = {
+		{'f' - 'a', 0, 0, 3},
+		{'d' - 'a', 0, 26, 28},
+		{'d' - 'a', 1, 6, 7},
+		{'a' - 'a', 0, 0, 0}, /* Uart3 is not supported by this scheme. */
+		{'c' - 'a', 2, 20, 10},
+	};
+	unsigned bitmask;
+	unsigned func;
+	unsigned char *port_base = (unsigned char *)0xb0010000;
+
+	if (uart > ARRAY_SIZE(uart_to_pins))
+		return -1;
+
+	bitmask = (1 << uart_to_pins[uart].rxd_pin) |
+		(1 << uart_to_pins[uart].txd_pin);
+
+	if (bitmask == 1)
+		return -1; /* Port 3 is not supported. */
+
+	/* mux pins */
+	/* From the JZ4780 Programmers Manual section 28.3
+		func |  int  mask pat1  pat0
+		  0  |    0    0     0     0
+		  1  |    0    0     0     1
+		  2  |    0    0     1     0
+		  3  |    0    0     1     1
+	*/
+	port_base += uart_to_pins[uart].gpio * 0x100;
+	func = uart_to_pins[uart].func;
+
+	writel(bitmask, port_base + 0x18); /* intc */
+	writel(bitmask, port_base + 0x28); /* maskc */
+	if (func & 2)
+		writel(bitmask, port_base + 0x34); /* pat1s */
+	else
+		writel(bitmask, port_base + 0x38); /* pat1c */
+
+	if (func & 1)
+		writel(bitmask, port_base + 0x44); /* pat0s */
+	else
+		writel(bitmask, port_base + 0x48); /* pat0c */
+
+	writel(bitmask, port_base + 0x78);
+
+	/* ungate UART clock */
+	if (uart < 4)
+		write_clkgr0(read_clkgr0() & ~(1 << (uart + 15)));
+	else
+		write_clkgr1(read_clkgr1() & ~CPM_CLKGR1_UART4);
+
+	return 0;
+}
+
 void uart_init(unsigned uart, unsigned baud)
 {
 	unsigned divisor;
@@ -66,15 +128,8 @@ void uart_init(unsigned uart, unsigned baud)
 	uart_baud = baud;
 	divisor = (uart_clk + (uart_baud * (16 / 2))) / (16 * uart_baud);
 
-	/* mux pins */
-	write_pxintc(2, 0x100400);
-	write_pxmskc(2, 0x100400);
-	write_pxpat1s(2, 0x100400);
-	write_pxpat0c(2, 0x100400);
-	write_pxpenc(2, 0x100400);
-
-	/* ungate UART clock */
-	write_clkgr1(read_clkgr1() & ~CPM_CLKGR1_UART4);
+	if (configure_uart_clock_and_pinmux(uart))
+		return; /* No Uart support is possible */
 
 	while (!(read_lsr() & LSR_TEMT));
 	write_ier(0);

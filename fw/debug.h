@@ -18,7 +18,7 @@ static inline void debug_init(void)
 	if (!config_enabled(DEBUG))
 		return;
 
-	uart_init(4, 115200);
+	uart_init(0, 115200);
 }
 
 static inline void debug(const char *str)
